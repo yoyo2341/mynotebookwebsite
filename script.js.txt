@@ -1,0 +1,49 @@
+// script.js
+document.addEventListener('DOMContentLoaded', function () {
+    const tabs = document.querySelector('.tabs');
+    const editor = document.getElementById('note-editor');
+    let activeTab = 'work';
+
+    // Load notes from localStorage
+    const notes = JSON.parse(localStorage.getItem('notes')) || {
+        work: '',
+        personal: '',
+        study: '',
+    };
+
+    editor.value = notes[activeTab];
+
+    // Switch tabs
+    tabs.addEventListener('click', function (e) {
+        if (e.target.classList.contains('tab') && !e.target.id) {
+            document.querySelector('.tab.active').classList.remove('active');
+            e.target.classList.add('active');
+            activeTab = e.target.dataset.tab;
+
+            // Load the note for the active tab
+            editor.value = notes[activeTab] || '';
+        }
+
+        // Add a new tab
+        if (e.target.id === 'add-tab') {
+            const newTabName = prompt('Enter the name for the new tab:');
+            if (newTabName && !notes[newTabName]) {
+                notes[newTabName] = '';
+                localStorage.setItem('notes', JSON.stringify(notes));
+
+                const newTab = document.createElement('div');
+                newTab.classList.add('tab');
+                newTab.setAttribute('data-tab', newTabName);
+                newTab.textContent = newTabName;
+
+                tabs.insertBefore(newTab, e.target);
+            }
+        }
+    });
+
+    // Save notes
+    editor.addEventListener('input', function () {
+        notes[activeTab] = editor.value;
+        localStorage.setItem('notes', JSON.stringify(notes));
+    });
+});
